@@ -1,24 +1,82 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
+import Like from "../components/common/like";
+import Pagination from "./common/pagination";
+import { paginate } from "../components/util/paginate";
+import EditMovieModal from "./editMovieModal";
 
 class Movies extends Component {
   state = {
-    movies: getMovies()
+    movies: getMovies(),
+    currentPage: 1,
+    pageSize: 6,
+    showModal: false,
+    editMovie: null
   };
-  
 
-  handleDelete(movie) {
+  handleDelete = movie => {
     const movies = this.state.movies.filter(m => m._id !== movie._id);
-    this.setState({movies});
-  }
+    this.setState({ movies });
+  };
 
+  handleLike = movie => {
+    const movies = [...this.state.movies];
+    const index = movies.indexOf(movie);
+    movies[index] = { ...movies[index] };
+    movies[index].liked = !movies[index].liked;
+    this.setState({ movies });
+  };
+
+  handlePageChange = page => {
+    this.setState({ currentPage: page });
+  };
+
+  handleEdit = movie => {
+    this.setState({ showModal: true, editMovie: movie });
+  };
+
+  handleSubmit = (event, title) => {
+    const form = event.currentTarget;
+
+      event.preventDefault();
+      event.stopPropagation();
+    if (form.checkValidity() === false) {
+      return;
+    }
+
+    const index = this.state.movies.indexOf(this.state.editMovie);
+    let movies = [...this.state.movies];
+    movies[index] = {...movies[index]};
+    movies[index].title = title;
+
+    this.setState({movies, editMovie: null, showModal: false});
+  };
+
+  handleCloseModal = () => {
+    this.setState({ showModal: false, editMovie: null});
+  };
+
+  renderModal = () => {
+    if (!this.state.editMovie) return null;
+    return <EditMovieModal
+    onSubmit={this.handleSubmit}
+    showModal={this.state.showModal}
+    onClose={this.handleCloseModal}
+    movie={this.state.editMovie}
+  />;
+  }
   render() {
     const { length: count } = this.state.movies;
-    if (count === 0) 
-        return <p> there are no movies</p>
+    const { pageSize, currentPage, movies: allMovies } = this.state;
+    if (count === 0) return <p> there are no movies</p>;
 
+    const movies = paginate(allMovies, currentPage, pageSize);
     return (
       <React.Fragment>
+        {
+          this.renderModal()
+        }
+        
         <p> showing {count} movies in the database.</p>
         <table className="table">
           <thead>
@@ -28,15 +86,23 @@ class Movies extends Component {
               <th>Stock</th>
               <th>Rate</th>
               <th></th>
+              <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {this.state.movies.map(movie => (
-              <tr key={movie._id}>
+            {movies.map(movie => (
+              <tr key={movie._id} onClick={() => this.handleEdit(movie)}>
                 <td>{movie.title}</td>
                 <td>{movie.genre.name}</td>
                 <td>{movie.numberInStock}</td>
                 <td>{movie.dailyRentalRate}</td>
+                <td>
+                  <Like
+                    liked={movie.liked}
+                    onClick={() => this.handleLike(movie)}
+                  />
+                </td>
                 <td>
                   {" "}
                   <button
@@ -46,10 +112,26 @@ class Movies extends Component {
                     Delete
                   </button>{" "}
                 </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    data-toggle="modal"
+                    data-target="#exampleModal"
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+        <Pagination
+          itemCount={count}
+          pageSize={pageSize}
+          onPageChange={this.handlePageChange}
+          currentPage={currentPage}
+        />
       </React.Fragment>
     );
   }
