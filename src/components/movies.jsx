@@ -92,7 +92,7 @@ class Movies extends Component {
           </thead>
           <tbody>
             {movies.map(movie => (
-              <tr key={movie._id} onClick={() => this.handleEdit(movie)}>
+              <tr key={movie._id} >
                 <td>{movie.title}</td>
                 <td>{movie.genre.name}</td>
                 <td>{movie.numberInStock}</td>
@@ -118,6 +118,7 @@ class Movies extends Component {
                     className="btn btn-primary"
                     data-toggle="modal"
                     data-target="#exampleModal"
+                    onClick={() => this.handleEdit(movie)}
                   >
                     Edit
                   </button>
