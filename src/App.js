@@ -1,63 +1,74 @@
 import React, { Component } from "react";
 import "./App.css";
 import Movies from "./components/movies";
+import { getMovies } from "./services/fakeMovieService";
 
 
 class App extends Component {
   state = {
-    counters: [
-      { id: 1, value: 4 },
-      { id: 2, value: 0 },
-      { id: 3, value: 2 },
-      { id: 4, value: 0 }
-    ]
+    movies: getMovies(),
+    currentPage: 1,
+    pageSize: 6,
+    showModal: false,
+    editMovie: null
   };
 
-  handleDelete = counterId => {
-    const counters = this.state.counters.filter(
-      counter => counter.id !== counterId
-    );
-    this.setState({ counters });
+  handleDelete = movie => {
+    const movies = this.state.movies.filter(m => m._id !== movie._id);
+    this.setState({ movies });
   };
 
-  handleReset = () => {
-    const counters = this.state.counters.map(counter => {
-      counter.value = 0;
-      return counter;
-    });
-    console.log(counters);
-    this.setState({ counters });
+  handleLike = movie => {
+    const movies = [...this.state.movies];
+    const index = movies.indexOf(movie);
+    movies[index] = { ...movies[index] };
+    movies[index].liked = !movies[index].liked;
+    this.setState({ movies });
   };
 
-  handleIncrement = counter => {
-    const counters = [...this.state.counters];
-    const index = this.state.counters.indexOf(counter);
-    ++counters[index].value;
-    this.setState({ counters });
+  handlePageChange = page => {
+    this.setState({ currentPage: page });
   };
 
-  handleDecrement = counter => {
-    const counters = [...this.state.counters];
-    const index = this.state.counters.indexOf(counter);
-    --counters[index].value;
-    this.setState({ counters });
+  handleEdit = movie => {
+    this.setState({ showModal: true, editMovie: movie });
+  };
+
+  handleSubmit = (event, title) => {
+    event.preventDefault();
+    if (event.currentTarget.checkValidity() === false) {
+      return;
+    }
+
+    const index = this.state.movies.indexOf(this.state.editMovie);
+    let movies = [...this.state.movies];
+    movies[index] = {...movies[index]};
+    movies[index].title = title;
+
+    this.setState({movies, editMovie: null, showModal: false});
+  };
+
+  handleCloseModal = () => {
+    this.setState({ showModal: false, editMovie: null});
   };
 
   render() {
     return (
       <React.Fragment>
-        {/* <NavBar totalCounters={this.state.counters.filter(counter => counter.value > 0).length} /> */}
         <main className="container">
-
-          {/* <Counters
-            counters={this.state.counters}
-            onReset={this.handleReset}
+          <Movies
+            onSubmit={this.handleSubmit}
+            showModal={this.state.showModal}
+            onCloseModal={this.handleCloseModal}
+            movies={this.state.movies}
+            pageSize={this.state.pageSize}
+            currentPage={this.state.currentPage}
+            onLike={this.handleLike}
             onDelete={this.handleDelete}
-            onIncrement={this.handleIncrement}
-            onDecrement={this.handleDecrement}
-          /> */}
-         
-          <Movies/>
+            onEdit={this.handleEdit}
+            editMovie={this.state.editMovie}
+            onPageChange={this.handlePageChange}
+          />
         </main>
       </React.Fragment>
     );

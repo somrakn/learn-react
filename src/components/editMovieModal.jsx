@@ -12,7 +12,7 @@ class EditMovieModal extends Component {
     this.props.onSubmit(event, this.title.value);
   }
   render() {
-    const {onClose, showModal, movie} = this.props;
+    const {onClose, showModal} = this.props;
     return (
       <Modal show={showModal} onHide={onClose}>
         <Modal.Header closeButton>
@@ -34,12 +34,6 @@ class EditMovieModal extends Component {
             </div>
           </Form>
         </Modal.Body>
-        {/* <Modal.Footer>
-          <Button variant="secondary" onClick={this.onClose}>
-            Close
-          </Button>
-          <Button onClick={this.onSave}>Save changes</Button>
-        </Modal.Footer> */}
       </Modal>
     );
   }
