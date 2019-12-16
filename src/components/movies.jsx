@@ -37,7 +37,6 @@ class Movies extends Component {
               <th>Rate</th>
               <th></th>
               <th></th>
-              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -54,24 +53,24 @@ class Movies extends Component {
                   />
                 </td>
                 <td>
-                  {" "}
-                  <button
-                    onClick={() => onDelete(movie)}
-                    className="btn btn-danger btn-sm"
-                  >
-                    Delete
-                  </button>{" "}
-                </td>
-                <td>
-                  <button
+                <button
                     type="button"
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-sm m-2"
                     data-toggle="modal"
                     data-target="#exampleModal"
                     onClick={() => onEdit(movie)}
                   >
                     Edit
                   </button>
+                  <button
+                    onClick={() => onDelete(movie)}
+                    className="btn btn-danger btn-sm"
+                  >
+                    Delete
+                  </button>
+                </td>
+                <td>
+                  
                 </td>
               </tr>
             ))}
